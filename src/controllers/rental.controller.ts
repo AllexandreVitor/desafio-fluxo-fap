@@ -13,8 +13,12 @@ export class RentalController {
       const { userId, carId, startDate, endDate } = req.body;
       const rental = await this.rentalService.createRental({ userId, carId, startDate, endDate });
       return res.status(201).json(rental);
-    } catch (error: any) {
-      return res.status(400).json({ error: error.message });
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        return res.status(400).json({ error: error.message });
+      }
+
+      return res.status(400).json({ error: 'Erro ao criar aluguel' });
     }
   }
 
@@ -23,8 +27,12 @@ export class RentalController {
       const { id } = req.params;
       const result = await this.rentalService.completeRental(id as string);
       return res.json(result);
-    } catch (error: any) {
-      return res.status(400).json({ error: error.message });
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        return res.status(400).json({ error: error.message });
+      }
+
+      return res.status(400).json({ error: 'Erro ao finalizar aluguel' });
     }
   }
 }

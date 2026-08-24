@@ -13,8 +13,12 @@ export class UserController {
       const { name, email, driverLicense } = req.body;
       const user = await this.userService.createUser({ name, email, driverLicense });
       return res.status(201).json(user);
-    } catch (error: any) {
-      return res.status(400).json({ error: error.message });
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        return res.status(400).json({ error: error.message });
+      }
+
+      return res.status(400).json({ error: 'Erro ao criar usuário' });
     }
   }
 
@@ -22,8 +26,12 @@ export class UserController {
     try {
       const users = await this.userService.getAllUsers();
       return res.json(users);
-    } catch (error: any) {
-      return res.status(500).json({ error: error.message });
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        return res.status(500).json({ error: error.message });
+      }
+
+      return res.status(500).json({ error: 'Erro ao buscar usuários' });
     }
   }
 }

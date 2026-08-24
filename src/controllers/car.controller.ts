@@ -13,8 +13,12 @@ export class CarController {
       const { brand, model, licensePlate, dailyRate } = req.body;
       const car = await this.carService.createCar({ brand, model, licensePlate, dailyRate });
       return res.status(201).json(car);
-    } catch (error: any) {
-      return res.status(400).json({ error: error.message });
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        return res.status(400).json({ error: error.message });
+      }
+
+      return res.status(400).json({ error: 'Erro ao criar carro' });
     }
   }
 
@@ -23,8 +27,12 @@ export class CarController {
       const { availableOnly } = req.query;
       const cars = await this.carService.getAllCars(availableOnly === 'true');
       return res.json(cars);
-    } catch (error: any) {
-      return res.status(500).json({ error: error.message });
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        return res.status(500).json({ error: error.message });
+      }
+
+      return res.status(500).json({ error: 'Erro ao buscar carros' });
     }
   }
 }
