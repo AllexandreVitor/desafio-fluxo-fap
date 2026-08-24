@@ -1,0 +1,76 @@
+name: CI/CD Pipeline - API Node
+
+on:
+    push:
+        branches:
+            - main
+
+jobs:
+    security-sast:
+        name: SAST (Segurança)
+        runs-on: ubuntu-latest
+        steps:
+            - name: checkout falhas e vulnerabilidades
+              uses: ajinabraham/njsscan-action@master
+              with:
+                args: "."
+
+    build:
+        name: Build
+        runs-on: ubuntu-latest
+        steps:
+            - name: checkout do código
+              uses: actions/checkout@v5
+
+            - name: configurar o Node.js
+              uses: actions/setup-node@v5
+              with:
+                node-version: "24"
+                cache: "npm"
+
+            - name: instalar dependencias
+              run: npm install
+
+            - name: compilar código
+              run: npm run build
+
+    lint-and-quanlity:
+        name: Lint & Quality
+        needs: build
+        runs-on: ubuntu-latest
+        steps:
+            - name: checkout do código
+              uses: actions/checkout@v5
+
+            - name: configurar o Node.js
+              uses: actions/setup-node@v5
+              with:
+                node-version: "24"
+                cache: "npm"
+
+            - name: instalar dependências
+              run: npm install
+
+            - name: executar linter (ESLint)
+              run: npm run lint
+
+    test:
+        name: Test
+        needs: build
+        runs-on: ubuntu-latest
+        steps:
+            - name: checkout do código
+              uses: actions/checkout@v5
+
+            - name: configurar Node.js
+              uses: actions/setup-node@v5
+              with:
+                node-version: "24"
+                cache: "npm"
+
+            - name: instalar depdendências
+              run: npm install
+
+            - name: executar testes unitarios (Jest)
+              run: npm test
+
